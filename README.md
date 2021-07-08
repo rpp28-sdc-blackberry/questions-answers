@@ -1,2 +1,2 @@
 # questions-answers
-Repository for Project Atelier's questions &amp; answers API service.
+Repository for Project Atelier's reviews API service.

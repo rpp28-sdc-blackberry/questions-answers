@@ -8,10 +8,12 @@ app.listen(port, () => {
   console.log(`Listening at http://localhost:${port}`);
 });
 
-db.testFunction()
-  .then((data) => {
-    console.log('got data in server:', data);
-  })
-  .catch((error) => {
-    console.log('error getting data in server:', error);
-  });
+// db.testFunction()
+//   .then((data) => {
+//     console.log('got data in server:', data);
+//   })
+//   .catch((error) => {
+//     console.log('error getting data in server:', error);
+//   });
+
+module.exports = { app };

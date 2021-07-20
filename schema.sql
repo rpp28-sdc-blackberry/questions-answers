@@ -64,7 +64,7 @@ CREATE TABLE characteristics_temp (
 CREATE TABLE characteristics_reviews_temp (
   id INT PRIMARY KEY,
   characteristic_id INT NOT NULL REFERENCES characteristics_temp(id),
-  review_id INT NOT NULL REFERENCES reviews_temp(id),
+  review_id INT NOT NULL REFERENCES reviews(id),
   value INT NOT NULL
 );
 

@@ -4,7 +4,7 @@
   "description": "Repository for Project Atelier's questions &amp; answers API service.",
   "main": "index.js",
   "scripts": {
-    "test": "jest --coverage --detectOpenHandles",
+    "test": "jest --coverage",
     "server-dev": "nodemon server/index.js"
   },
   "repository": {

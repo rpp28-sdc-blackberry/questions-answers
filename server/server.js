@@ -37,6 +37,8 @@ app.get('/reviews', (req, res) => {
 
 app.get('/reviews/meta', (req, res) => {
   const productId = req.query.product_id;
+
+  db.getMeta(productId);
   res.status(200).send(`Success hitting meta endpoint with product ID: ${productId}`);
 });
 

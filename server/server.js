@@ -30,8 +30,8 @@ app.get('/reviews', (req, res) => {
       res.status(200).send(resObject);
     })
     .catch((error) => {
-      console.log('error getting reviews in server:', error);
-      res.status(500).send('error getting reviews in server');
+      console.log('Error getting reviews in server:', error);
+      res.status(500).send('Error getting reviews in server');
     });
 });
 
@@ -49,8 +49,8 @@ app.get('/reviews/meta', (req, res) => {
       res.status(200).send(metaObject);
     })
     .catch((error) => {
-      console.log('error getting metadata in server:', error);
-      res.status(500).send('error getting metadata in server');
+      console.log('Error getting metadata in server:', error);
+      res.status(500).send('Error getting metadata in server');
     });
 });
 
@@ -61,8 +61,15 @@ app.post('/reviews', (req, res) => {
 
 app.put('/reviews/:review_id/helpful', (req, res) => {
   const reviewId = req.params.review_id;
-  console.log(reviewId);
-  res.status(204).end();
+  db.updateHelpfulness(reviewId)
+    .then((updatedRows) => {
+      console.log(`Successfully updated ${updatedRows} row(s)`);
+      res.status(204).end();
+    })
+    .catch((error) => {
+      console.log('Error updating review helpfulness:', error);
+      res.status(500).send('Error updating review helpfulness');
+    });
 });
 
 app.put('/reviews/:review_id/report', (req, res) => {

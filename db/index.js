@@ -58,4 +58,19 @@ const getMeta = (productId) => {
     .catch((error) => error.stack);
 };
 
-module.exports = { getReviews, getMeta };
+const updateHelpfulness = (reviewId) => {
+  const getHelpfulnessQuery = `SELECT helpfulness FROM reviews WHERE id = ${reviewId}`;
+  const updateHelpfulnessQuery = `UPDATE reviews SET helpfulness = $1 WHERE id = ${reviewId}`;
+
+  return client.query(getHelpfulnessQuery)
+    .then((res1) => {
+      const newHelpfulness = [res1.rows[0].helpfulness + 1];
+
+      return client.query(updateHelpfulnessQuery, newHelpfulness)
+        .then((res2) => res2.rowCount)
+        .catch((error) => error.stack);
+    })
+    .catch((error) => error.stack);
+};
+
+module.exports = { getReviews, getMeta, updateHelpfulness };

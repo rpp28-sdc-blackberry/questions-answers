@@ -74,8 +74,15 @@ app.put('/reviews/:review_id/helpful', (req, res) => {
 
 app.put('/reviews/:review_id/report', (req, res) => {
   const reviewId = req.params.review_id;
-  console.log(reviewId);
-  res.status(204).end();
+  db.reportReview(reviewId)
+    .then((updatedRows) => {
+      console.log(`Successfully updated ${updatedRows} row(s)`);
+      res.status(204).end();
+    })
+    .catch((error) => {
+      console.log('Error reporting review:', error);
+      res.status(500).send('Error reporting review');
+    });
 });
 
 module.exports = app;

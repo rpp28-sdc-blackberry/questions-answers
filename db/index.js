@@ -73,4 +73,14 @@ const updateHelpfulness = (reviewId) => {
     .catch((error) => error.stack);
 };
 
-module.exports = { getReviews, getMeta, updateHelpfulness };
+const reportReview = (reviewId) => {
+  const reportQuery = `UPDATE reviews SET reported = true WHERE id = ${reviewId}`;
+
+  return client.query(reportQuery)
+    .then((res) => res.rowCount)
+    .catch((error) => error.stack);
+};
+
+module.exports = {
+  getReviews, getMeta, updateHelpfulness, reportReview,
+};

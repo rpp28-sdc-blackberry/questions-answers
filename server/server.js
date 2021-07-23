@@ -38,8 +38,20 @@ app.get('/reviews', (req, res) => {
 app.get('/reviews/meta', (req, res) => {
   const productId = req.query.product_id;
 
-  db.getMeta(productId);
-  res.status(200).send(`Success hitting meta endpoint with product ID: ${productId}`);
+  db.getMeta(productId)
+    .then((objectsArray) => {
+      const metaObject = {
+        ratings: objectsArray[0],
+        recommended: objectsArray[1],
+        characteristics: objectsArray[2],
+      };
+
+      res.status(200).send(metaObject);
+    })
+    .catch((error) => {
+      console.log('error getting metadata in server:', error);
+      res.status(500).send('error getting metadata in server');
+    });
 });
 
 app.post('/reviews', (req, res) => {

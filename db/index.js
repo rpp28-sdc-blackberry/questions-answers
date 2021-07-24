@@ -3,11 +3,11 @@ const { Client } = require('pg');
 const helpers = require('./helpers');
 
 const client = new Client({
-  user: 'postgres',
-  host: 'localhost',
-  database: 'sdc_reviews',
-  password: 'password',
-  port: 5432,
+  user: process.env.PG_USER,
+  host: process.env.PG_HOST,
+  database: process.env.PG_DATABASE,
+  password: process.env.PG_PASSWORD,
+  port: process.env.PG_PORT,
 });
 
 client.connect()
@@ -17,16 +17,15 @@ client.connect()
 const getReviews = (productId, sort, offset, count) => {
   let sortValue;
   if (sort === 'newest') {
-    sortValue = 'date';
+    sortValue = 'date DESC';
   } else if (sort === 'helpful') {
-    sortValue = 'helpfulness';
+    sortValue = 'helpfulness DESC';
   } else if (sort === 'relevant') {
-    sortValue = 'rating';
+    sortValue = 'date DESC, helpfulness DESC';
   } else { console.log('invalid sort value'); }
 
-  // Need to implement an algorithm to sort by RELEVANCE somehow
   const query = {
-    text: `SELECT * FROM reviews WHERE product_id = $1 AND reported = false ORDER BY ${sortValue} DESC OFFSET $2 LIMIT $3`,
+    text: `SELECT * FROM reviews WHERE product_id = $1 AND reported = false ORDER BY ${sortValue} OFFSET $2 LIMIT $3`,
     values: [productId, offset, count],
   };
 

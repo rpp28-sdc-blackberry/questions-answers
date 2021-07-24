@@ -1,9 +1,12 @@
-DROP TABLE IF EXISTS meta;
-DROP TABLE IF EXISTS characteristics_reviews_temp;
-DROP TABLE IF EXISTS characteristics_temp;
+DROP TABLE IF EXISTS characteristics_reviews;
+DROP TABLE IF EXISTS characteristics;
 DROP TABLE IF EXISTS photos;
 DROP TABLE IF EXISTS reviews;
 DROP TABLE IF EXISTS reviews_temp;
+DROP SEQUENCE IF EXISTS reviews_seq;
+DROP SEQUENCE IF EXISTS photos_seq;
+DROP SEQUENCE IF EXISTS characteristics_seq;
+DROP SEQUENCE IF EXISTS characteristics_reviews_seq;
 
 -- REVIEWS TABLE
 CREATE TABLE reviews_temp (
@@ -44,6 +47,11 @@ INSERT INTO reviews (id, product_id, rating, date, summary, body, recommend, rep
 SELECT id, product_id, rating, to_timestamp(date/1000), summary, body, recommend, reported, reviewer_name, reviewer_email, response, helpfulness
 FROM reviews_temp;
 
+-- Create a sequence for reviews table to make sure new reviews generate a unique id
+CREATE SEQUENCE reviews_seq START 1;
+SELECT setval('reviews_seq', max(id)) FROM reviews;
+ALTER TABLE reviews ALTER COLUMN id SET DEFAULT nextval('reviews_seq');
+
 -- PHOTOS TABLE
 CREATE TABLE photos (
   id INT PRIMARY KEY,
@@ -54,31 +62,38 @@ CREATE TABLE photos (
 -- Copy data directly into photos table
 \COPY photos FROM '/Users/jabrake/Downloads/reviews_photos.csv' DELIMITER ',' CSV HEADER;
 
--- CHARACTERISTIC TABLES
-CREATE TABLE characteristics_temp (
+-- Create a sequence for photos table to make sure new photos generate a unique id
+CREATE SEQUENCE photos_seq START 1;
+SELECT setval('photos_seq', max(id)) FROM photos;
+ALTER TABLE photos ALTER COLUMN id SET DEFAULT nextval('photos_seq');
+
+-- CHARACTERISTICS TABLES
+CREATE TABLE characteristics (
   id INT PRIMARY KEY,
   product_id INT NOT NULL,
   name VARCHAR (255) NOT NULL
 );
 
-CREATE TABLE characteristics_reviews_temp (
+CREATE TABLE characteristics_reviews (
   id INT PRIMARY KEY,
-  characteristic_id INT NOT NULL REFERENCES characteristics_temp(id),
+  characteristic_id INT NOT NULL REFERENCES characteristics(id),
   review_id INT NOT NULL REFERENCES reviews(id),
   value INT NOT NULL
 );
 
--- Copy data into a temporary characteristics table that we will use later to merge into Meta table
-\COPY characteristics_temp FROM '/Users/jabrake/Downloads/characteristics.csv' DELIMITER ',' CSV HEADER;
+\COPY characteristics FROM '/Users/jabrake/Downloads/characteristics.csv' DELIMITER ',' CSV HEADER;
 
--- Copy data into a temporary characteristics_reviews table that we will use later to merge into Meta table
-\COPY characteristics_reviews_temp FROM '/Users/jabrake/Downloads/characteristic_reviews.csv' DELIMITER ',' CSV HEADER;
+\COPY characteristics_reviews FROM '/Users/jabrake/Downloads/characteristic_reviews.csv' DELIMITER ',' CSV HEADER;
 
--- META TABLE
-CREATE TABLE meta (
-  id INT PRIMARY KEY,
-  product_id INT NOT NULL,
-  ratings JSON NOT NULL,
-  recommended JSON NOT NULL,
-  characteristics JSON NOT NULL
-);
+-- Create a sequence for characteristics table to make sure new characteristics generate a unique id
+CREATE SEQUENCE characteristics_seq START 1;
+SELECT setval('characteristics_seq', max(id)) FROM characteristics;
+ALTER TABLE characteristics ALTER COLUMN id SET DEFAULT nextval('characteristics_seq');
+
+-- Create a sequence for characteristics_reviews table to make sure new characteristics_reviews entries generate a unique id
+CREATE SEQUENCE characteristics_reviews_seq START 1;
+SELECT setval('characteristics_reviews_seq', max(id)) FROM characteristics_reviews;
+ALTER TABLE characteristics_reviews ALTER COLUMN id SET DEFAULT nextval('characteristics_reviews_seq');
+
+-- Delete temporary reviews table
+DROP TABLE IF EXISTS reviews_temp;

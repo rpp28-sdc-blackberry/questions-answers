@@ -14,7 +14,6 @@ client.connect()
   .then(() => console.log('Connected to Postgres server!'))
   .catch((error) => console.log('Could not connect to Postgres server:', error));
 
-// NEED TO UPDATE TO EXCLUDE REPORTED REVIEWS
 const getReviews = (productId, sort, offset, count) => {
   let sortValue;
   if (sort === 'newest') {
@@ -27,7 +26,7 @@ const getReviews = (productId, sort, offset, count) => {
 
   // Need to implement an algorithm to sort by RELEVANCE somehow
   const query = {
-    text: `SELECT * FROM reviews WHERE product_id = $1 ORDER BY ${sortValue} DESC OFFSET $2 LIMIT $3`,
+    text: `SELECT * FROM reviews WHERE product_id = $1 AND reported = false ORDER BY ${sortValue} DESC OFFSET $2 LIMIT $3`,
     values: [productId, offset, count],
   };
 

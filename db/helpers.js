@@ -6,6 +6,7 @@ const createRatingsRecommendedObj = (rows) => {
   };
 
   rows.forEach((row) => {
+    // eslint-disable-next-line prefer-destructuring
     const rating = row.rating;
     const recommendedValue = row.recommend;
     if (!ratings[rating]) {
@@ -29,6 +30,7 @@ const createCharacteristicsObj = (rows) => {
   const counts = {};
 
   rows.forEach((row) => {
+    // eslint-disable-next-line prefer-destructuring
     const name = row.name;
     if (!characteristics[name]) {
       characteristics[name] = {
@@ -54,4 +56,34 @@ const createCharacteristicsObj = (rows) => {
   return characteristics;
 };
 
-module.exports = { createRatingsRecommendedObj, createCharacteristicsObj };
+const createUpdatePhotosQuery = (reviewId, photosArray) => {
+  let updatePhotosValues = '';
+
+  photosArray.forEach((photoURL) => {
+    updatePhotosValues += `(${reviewId}, '${photoURL}'), `;
+  });
+  updatePhotosValues = updatePhotosValues.slice(0, -2);
+
+  const updatePhotosQuery = `INSERT INTO photos(review_id, url) VALUES${updatePhotosValues}`;
+  return updatePhotosQuery;
+};
+
+const createUpdateCharacteristicsReviewsQuery = (reviewId, characteristicsObject) => {
+  let updateCharacteristicsReviewsValues = '';
+  const characteristicsKeys = Object.keys(characteristicsObject);
+
+  characteristicsKeys.forEach((key) => {
+    updateCharacteristicsReviewsValues += `(${key}, ${reviewId}, ${characteristicsObject[key]}), `;
+  });
+  updateCharacteristicsReviewsValues = updateCharacteristicsReviewsValues.slice(0, -2);
+
+  const updateCharacteristicsReviewsQuery = `INSERT INTO characteristics_reviews(characteristic_id, review_id, value) VALUES${updateCharacteristicsReviewsValues}`;
+  return updateCharacteristicsReviewsQuery;
+};
+
+module.exports = {
+  createRatingsRecommendedObj,
+  createCharacteristicsObj,
+  createUpdatePhotosQuery,
+  createUpdateCharacteristicsReviewsQuery,
+};

@@ -55,8 +55,10 @@ app.get('/reviews/meta', (req, res) => {
 });
 
 app.post('/reviews', (req, res) => {
-  console.log(req.body);
-  res.status(201).send('Success creating new review');
+  const reviewDetails = req.body;
+  db.postReview(reviewDetails)
+    .then(() => res.status(201).send('Success posting new review'))
+    .catch((error) => res.status(500).send(`Error posting new review: ${error}`));
 });
 
 app.put('/reviews/:review_id/helpful', (req, res) => {

@@ -14,6 +14,7 @@ client.connect()
   .then(() => console.log('Connected to Postgres server!'))
   .catch((error) => console.log('Could not connect to Postgres server:', error));
 
+// NEED TO UPDATE TO EXCLUDE REPORTED REVIEWS
 const getReviews = (productId, sort, offset, count) => {
   let sortValue;
   if (sort === 'newest') {
@@ -36,13 +37,13 @@ const getReviews = (productId, sort, offset, count) => {
 };
 
 const getMeta = (productId) => {
-  const characteristicsQuery = `SELECT value, characteristics_temp.id, name
-  FROM reviews_temp
-  INNER JOIN characteristics_reviews_temp
-  ON reviews_temp.id = review_id AND reviews_temp.product_id = ${productId}
-  INNER JOIN characteristics_temp
-  ON characteristics_temp.id = characteristic_id AND
-  characteristics_temp.product_id = ${productId}`;
+  const characteristicsQuery = `SELECT value, characteristics.id, name
+  FROM reviews
+  INNER JOIN characteristics_reviews
+  ON reviews.id = review_id AND reviews.product_id = ${productId}
+  INNER JOIN characteristics
+  ON characteristics.id = characteristic_id AND
+  characteristics.product_id = ${productId}`;
 
   const ratingsRecommendQuery = `SELECT rating, recommend FROM reviews WHERE product_id = ${productId}`;
 
@@ -57,6 +58,43 @@ const getMeta = (productId) => {
     })
     .catch((error) => error.stack);
 };
+
+const updateReviewsTable = (reviewDetails) => {
+  const updateReviewsQuery = 'INSERT INTO reviews(product_id, rating, date, summary, body, recommend, reported, reviewer_name, reviewer_email, response, helpfulness) VALUES ($1, $2, current_timestamp, $3, $4, $5, false, $6, $7, null, 0) RETURNING id';
+
+  const updateReviewsValues = [reviewDetails.product_id, reviewDetails.rating,
+    reviewDetails.summary, reviewDetails.body, reviewDetails.recommend,
+    reviewDetails.name, reviewDetails.email];
+
+  return client.query(updateReviewsQuery, updateReviewsValues)
+    .then((res) => res.rows[0].id)
+    .catch((error) => error.stack);
+};
+
+const updatePhotosTable = (reviewId, photosArray) => {
+  const updatePhotosQuery = helpers.createUpdatePhotosQuery(reviewId, photosArray);
+  return client.query(updatePhotosQuery)
+    .then((res) => console.log('Inserted rows:', res.rowCount))
+    .catch((error) => error.stack);
+};
+
+const updateCharacteristicsReviewsTable = (reviewId, characteristicsObject) => {
+  // eslint-disable-next-line max-len
+  const updateCharacteristicsReviewsQuery = helpers.createUpdateCharacteristicsReviewsQuery(reviewId, characteristicsObject);
+  return client.query(updateCharacteristicsReviewsQuery)
+    .then((res) => console.log('Inserted rows:', res.rowCount))
+    .catch((error) => error.stack);
+};
+
+async function postReview(reviewDetails) {
+  const reviewId = await updateReviewsTable(reviewDetails);
+
+  if (reviewDetails.photos.length) {
+    await updatePhotosTable(reviewId, reviewDetails.photos);
+  }
+
+  await updateCharacteristicsReviewsTable(reviewId, reviewDetails.characteristics);
+}
 
 const updateHelpfulness = (reviewId) => {
   const getHelpfulnessQuery = `SELECT helpfulness FROM reviews WHERE id = ${reviewId}`;
@@ -82,5 +120,5 @@ const reportReview = (reviewId) => {
 };
 
 module.exports = {
-  getReviews, getMeta, updateHelpfulness, reportReview,
+  getReviews, getMeta, postReview, updateHelpfulness, reportReview,
 };

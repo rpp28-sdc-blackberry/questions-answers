@@ -32,11 +32,11 @@ CREATE TABLE reviews (
   summary VARCHAR (255) NOT NULL,
   body TEXT NOT NULL,
   recommend BOOLEAN NOT NULL,
-  reported BOOLEAN NOT NULL,
+  reported BOOLEAN NOT NULL DEFAULT false,
   reviewer_name VARCHAR (255) NOT NULL,
   reviewer_email VARCHAR (255) NOT NULL,
-  response VARCHAR (1000) NOT NULL,
-  helpfulness INT NOT NULL
+  response VARCHAR (1000),
+  helpfulness INT NOT NULL DEFAULT 0
 );
 
 -- Copy data into a temporary reviews table that we will use next

@@ -12,8 +12,8 @@ const getReviews = (productId, sort, offset, count) => {
   } else { console.log('invalid sort value'); }
 
   const query = {
-    text: `SELECT * FROM reviews WHERE product_id = $1 AND reported = false ORDER BY ${sortValue} OFFSET $2 LIMIT $3`,
-    values: [productId, offset, count],
+    text: 'SELECT * FROM reviews WHERE product_id = $1 AND reported = false ORDER BY $2 OFFSET $3 LIMIT $4',
+    values: [productId, sortValue, offset, count],
   };
 
   return client.query(query)

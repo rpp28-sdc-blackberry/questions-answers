@@ -1,5 +1,5 @@
 const express = require('express');
-const db = require('../db/index');
+const db = require('../db/models');
 
 const app = express();
 
@@ -29,10 +29,7 @@ app.get('/reviews', (req, res) => {
 
       res.status(200).send(resObject);
     })
-    .catch((error) => {
-      console.log('Error getting reviews in server:', error);
-      res.status(500).send('Error getting reviews in server');
-    });
+    .catch((error) => res.status(500).send(`Error getting reviews in server: ${error}`));
 });
 
 app.get('/reviews/meta', (req, res) => {
@@ -48,10 +45,7 @@ app.get('/reviews/meta', (req, res) => {
 
       res.status(200).send(metaObject);
     })
-    .catch((error) => {
-      console.log('Error getting metadata in server:', error);
-      res.status(500).send('Error getting metadata in server');
-    });
+    .catch((error) => res.status(500).send(`Error getting metadata in server: ${error}`));
 });
 
 app.post('/reviews', (req, res) => {
@@ -68,10 +62,7 @@ app.put('/reviews/:review_id/helpful', (req, res) => {
       console.log(`Successfully updated ${updatedRows} row(s)`);
       res.status(204).end();
     })
-    .catch((error) => {
-      console.log('Error updating review helpfulness:', error);
-      res.status(500).send('Error updating review helpfulness');
-    });
+    .catch((error) => res.status(500).send(`Error updating review helpfulness: ${error}`));
 });
 
 app.put('/reviews/:review_id/report', (req, res) => {
@@ -81,10 +72,7 @@ app.put('/reviews/:review_id/report', (req, res) => {
       console.log(`Successfully updated ${updatedRows} row(s)`);
       res.status(204).end();
     })
-    .catch((error) => {
-      console.log('Error reporting review:', error);
-      res.status(500).send('Error reporting review');
-    });
+    .catch((error) => res.status(500).send(`Error reporting review: ${error}`));
 });
 
 module.exports = app;

@@ -72,13 +72,27 @@ const updateCharacteristicsReviewsTable = (reviewId, characteristicsObject) => {
 };
 
 async function postReview(reviewDetails) {
-  const reviewId = await updateReviewsTable(reviewDetails);
+  let reviewId;
 
-  if (reviewDetails.photos.length) {
-    await updatePhotosTable(reviewId, reviewDetails.photos);
+  try {
+    reviewId = await updateReviewsTable(reviewDetails);
+  } catch (error) {
+    console.log('Error updating reviews table:', error);
   }
 
-  await updateCharacteristicsReviewsTable(reviewId, reviewDetails.characteristics);
+  if (reviewDetails.photos.length) {
+    try {
+      await updatePhotosTable(reviewId, reviewDetails.photos);
+    } catch (error) {
+      console.log('Error updating photos table:', error);
+    }
+  }
+
+  try {
+    await updateCharacteristicsReviewsTable(reviewId, reviewDetails.characteristics);
+  } catch (error) {
+    console.log('Error updating characteristics reviews table:', error);
+  }
 }
 
 const updateHelpfulness = (reviewId) => {

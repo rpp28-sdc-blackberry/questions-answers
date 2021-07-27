@@ -19,6 +19,11 @@ jobs:
       - image: cimg/node:15.1
     # Then run your tests!
     # CircleCI will report the results back to your VCS provider.
+      - image: circleci/postgres:9.6-alpine
+        environment:
+          POSTGRES_USER: postgres
+          POSTGRES_DB: sdc_reviews
+
     steps:
       # Checkout the code as the first step.
       - checkout

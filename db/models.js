@@ -1,4 +1,4 @@
-const client = require('./index');
+const pool = require('./index');
 const helpers = require('./helpers');
 
 const getReviews = (productId, sort, offset, count) => {
@@ -16,7 +16,7 @@ const getReviews = (productId, sort, offset, count) => {
     values: [productId, sortValue, offset, count],
   };
 
-  return client.query(query)
+  return pool.query(query)
     .then((res) => res.rows)
     .catch((error) => error.stack);
 };
@@ -33,8 +33,8 @@ const getMeta = (productId) => {
   const ratingsRecommendQuery = `SELECT rating, recommend FROM reviews WHERE product_id = ${productId}`;
 
   return Promise.all([
-    client.query(ratingsRecommendQuery),
-    client.query(characteristicsQuery),
+    pool.query(ratingsRecommendQuery),
+    pool.query(characteristicsQuery),
   ])
     .then((res) => {
       const ratingsRecommended = helpers.createRatingsRecommendedObj(res[0].rows);
@@ -51,14 +51,14 @@ const updateReviewsTable = (reviewDetails) => {
     reviewDetails.summary, reviewDetails.body, reviewDetails.recommend,
     reviewDetails.name, reviewDetails.email];
 
-  return client.query(updateReviewsQuery, updateReviewsValues)
+  return pool.query(updateReviewsQuery, updateReviewsValues)
     .then((res) => res.rows[0].id)
     .catch((error) => error.stack);
 };
 
 const updatePhotosTable = (reviewId, photosArray) => {
   const updatePhotosQuery = helpers.createUpdatePhotosQuery(reviewId, photosArray);
-  return client.query(updatePhotosQuery)
+  return pool.query(updatePhotosQuery)
     .then((res) => console.log('Inserted rows:', res.rowCount))
     .catch((error) => error.stack);
 };
@@ -66,7 +66,7 @@ const updatePhotosTable = (reviewId, photosArray) => {
 const updateCharacteristicsReviewsTable = (reviewId, characteristicsObject) => {
   // eslint-disable-next-line max-len
   const updateCharacteristicsReviewsQuery = helpers.createUpdateCharacteristicsReviewsQuery(reviewId, characteristicsObject);
-  return client.query(updateCharacteristicsReviewsQuery)
+  return pool.query(updateCharacteristicsReviewsQuery)
     .then((res) => console.log('Inserted rows:', res.rowCount))
     .catch((error) => error.stack);
 };
@@ -99,11 +99,11 @@ const updateHelpfulness = (reviewId) => {
   const getHelpfulnessQuery = `SELECT helpfulness FROM reviews WHERE id = ${reviewId}`;
   const updateHelpfulnessQuery = `UPDATE reviews SET helpfulness = $1 WHERE id = ${reviewId}`;
 
-  return client.query(getHelpfulnessQuery)
+  return pool.query(getHelpfulnessQuery)
     .then((res1) => {
       const newHelpfulness = [res1.rows[0].helpfulness + 1];
 
-      return client.query(updateHelpfulnessQuery, newHelpfulness)
+      return pool.query(updateHelpfulnessQuery, newHelpfulness)
         .then((res2) => res2.rowCount)
         .catch((error) => error.stack);
     })
@@ -113,7 +113,7 @@ const updateHelpfulness = (reviewId) => {
 const reportReview = (reviewId) => {
   const reportQuery = `UPDATE reviews SET reported = true WHERE id = ${reviewId}`;
 
-  return client.query(reportQuery)
+  return pool.query(reportQuery)
     .then((res) => res.rowCount)
     .catch((error) => error.stack);
 };

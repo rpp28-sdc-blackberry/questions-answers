@@ -28,14 +28,14 @@ afterAll(async () => {
 
 describe('GET requests to the /reviews endpoint', () => {
   it('should respond with 200', async () => {
-    const response = await request.get('/reviews?product_id=2&page=1&count=4&sort=newest');
+    const response = await request.get('/reviews?product_id=1&page=1&count=4&sort=newest');
     expect(response.statusCode).toBe(200);
   });
 });
 
 describe('GET requests to the /reviews/meta endpoint', () => {
   it('should respond with 200', async () => {
-    const response = await request.get('/reviews/meta?product_id=2');
+    const response = await request.get('/reviews/meta?product_id=1');
     expect(response.statusCode).toBe(200);
   });
 });
@@ -64,14 +64,14 @@ describe('GET requests to the /reviews/meta endpoint', () => {
 
 describe('PUT requests to the /helpful endpoint', () => {
   it('should respond with 204', async () => {
-    const response = await request.put('/reviews/16/helpful');
+    const response = await request.put('/reviews/1/helpful');
     expect(response.statusCode).toBe(204);
   });
 });
 
 describe('PUT requests to the /report endpoint', () => {
   it('should respond with 204', async () => {
-    const response = await request.put('/reviews/16/report');
+    const response = await request.put('/reviews/1/report');
     expect(response.statusCode).toBe(204);
   });
 });

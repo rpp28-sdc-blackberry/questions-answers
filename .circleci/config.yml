@@ -21,7 +21,7 @@ jobs:
           NODE_ENV: test
           TEST_DATABASE_URL: postgresql://postgres@localhost/reviews_test
           # POSTGRES_USER: postgres
-          POSTGRES_DB: reviews_test
+          PG_DATABASE: reviews_test
     # Then run your tests!
     # CircleCI will report the results back to your VCS provider.
       - image: circleci/postgres:9.6-alpine

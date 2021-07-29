@@ -33,7 +33,8 @@ jobs:
       - run: sudo apt-get update && sudo apt-get install postgresql-client
       - run:
           name: Create reviews table
-          command: psql \
+          command: |
+                  psql \
                   -d $TEST_DATABASE_URL \
                   -c "CREATE TABLE reviews (
                       id SERIAL PRIMARY KEY,
@@ -52,7 +53,8 @@ jobs:
 
       - run:
           name: Create photos table
-          command: psql \
+          command: |
+                  psql \
                   -d $TEST_DATABASE_URL \
                   -c "CREATE TABLE photos (
                       id SERIAL PRIMARY KEY,
@@ -62,7 +64,8 @@ jobs:
 
       - run:
           name: Create characteristics table
-          command: psql \
+          command: |
+                  psql \
                   -d $TEST_DATABASE_URL \
                   -c "CREATE TABLE characteristics (
                       id SERIAL PRIMARY KEY,
@@ -72,7 +75,8 @@ jobs:
 
       - run:
           name: Create characteristics_reviews table
-          command: psql \
+          command: |
+                  psql \
                   -d $TEST_DATABASE_URL \
                   -c "CREATE TABLE characteristics_reviews (
                       id SERIAL PRIMARY KEY,

@@ -17,16 +17,66 @@ jobs:
     # A list of available CircleCI Docker Convenience Images are available here: https://circleci.com/developer/images/image/cimg/node
     docker:
       - image: cimg/node:15.1
+        environment:
+          NODE_ENV: test
+          TEST_DATABASE_URL: postgresql://postgres@localhost/reviews_test
+          POSTGRES_DB: reviews_test
     # Then run your tests!
     # CircleCI will report the results back to your VCS provider.
       - image: circleci/postgres:9.6-alpine
         environment:
-          POSTGRES_USER: postgres
-          POSTGRES_DB: sdc_reviews
+          POSTGRES_DB: reviews_test
 
     steps:
       # Checkout the code as the first step.
       - checkout
+      - run: sudo apt-get update && sudo apt-get install postgresql-client
+      - run: |
+        psql \
+        -d $ TEST_DATABASE_URL \
+        -c "CREATE TABLE reviews (
+            id SERIAL PRIMARY KEY,
+            product_id INT NOT NULL,
+            rating INT NOT NULL,
+            date TIMESTAMP NOT NULL,
+            summary VARCHAR (255) NOT NULL,
+            body TEXT NOT NULL,
+            recommend BOOLEAN NOT NULL,
+            reported BOOLEAN NOT NULL DEFAULT false,
+            reviewer_name VARCHAR (255) NOT NULL,
+            reviewer_email VARCHAR (255) NOT NULL,
+            response VARCHAR (1000),
+            helpfulness INT NOT NULL DEFAULT 0
+          );"
+
+      - run: |
+        psql \
+        -d $ TEST_DATABASE_URL \
+        -c "CREATE TABLE photos (
+            id SERIAL PRIMARY KEY,
+            review_id INT NOT NULL REFERENCES reviews(id),
+            url TEXT NOT NULL
+          );"
+
+      - run: |
+        psql \
+        -d $ TEST_DATABASE_URL \
+        -c "CREATE TABLE characteristics (
+            id SERIAL PRIMARY KEY,
+            product_id INT NOT NULL,
+            name VARCHAR (255) NOT NULL
+          );"
+
+      - run: |
+        psql \
+        -d $ TEST_DATABASE_URL \
+        -c "CREATE TABLE characteristics_reviews (
+            id SERIAL PRIMARY KEY,
+            characteristic_id INT NOT NULL REFERENCES characteristics(id),
+            review_id INT NOT NULL REFERENCES reviews(id),
+            value INT NOT NULL
+          );"
+
       # Next, the node orb's install-packages step will install the dependencies from a package.json.
       # The orb install-packages step will also automatically cache them for faster future runs.
       - node/install-packages

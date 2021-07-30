@@ -27,9 +27,17 @@ afterAll(async () => {
 });
 
 describe('GET requests to the /reviews endpoint', () => {
-  it('should respond with 200', async () => {
-    const response = await request.get('/reviews?product_id=1&page=1&count=4&sort=newest');
+  it('should respond with 200 and return one review', async () => {
+    const response = await request.get('/reviews?product_id=1&page=1&count=1&sort=newest');
+    const reviews = response.body.results;
+
     expect(response.statusCode).toBe(200);
+    expect(response.body.product).toEqual(1);
+    expect(response.body.page).toEqual(1);
+    expect(response.body.count).toEqual(1);
+
+    expect(reviews.length).toEqual(1);
+    expect(reviews[0].id).toEqual(1);
   });
 });
 
@@ -37,30 +45,35 @@ describe('GET requests to the /reviews/meta endpoint', () => {
   it('should respond with 200', async () => {
     const response = await request.get('/reviews/meta?product_id=1');
     expect(response.statusCode).toBe(200);
+    expect(response.body.product_id).toEqual(1);
   });
 });
 
-// describe('POST requests to the reviews endpoint', () => {
-//   const review = {
-//     product_id: 2,
-//     rating: 4,
-//     summary: 'my fave product',
-//     body: 'it is the greatest thing EVER!',
-//     recommend: true,
-//     name: 'jorge',
-//     email: 'jorge@gmail.com',
-//     photos: ['www.google.com', 'www.hackreactor.com'],
-//     characteristics: {
-//       14: 99,
-//       15: 99,
-//     },
-//   };
+describe('POST requests to the reviews endpoint', () => {
+  const review = {
+    product_id: 1,
+    rating: 4,
+    summary: 'my fave product',
+    body: 'it is the greatest thing EVER!',
+    recommend: true,
+    name: 'jorge',
+    email: 'jorge@gmail.com',
+    photos: ['www.google.com', 'www.hackreactor.com'],
+    characteristics: {
+      1: 4,
+    },
+  };
 
-//   it('should respond with 201', async () => {
-//     const response = await request.post('/reviews').send(review);
-//     expect(response.statusCode).toBe(201);
-//   });
-// });
+  it('should respond with 201 and two reviews', async () => {
+    const postResponse = await request.post('/reviews').send(review);
+    expect(postResponse.statusCode).toBe(201);
+
+    const getResponse = await request.get('/reviews?product_id=1');
+    const reviews = getResponse.body.results;
+    expect(reviews.length).toEqual(2);
+    expect(reviews[1].id).toEqual(2);
+  });
+});
 
 describe('PUT requests to the /helpful endpoint', () => {
   it('should respond with 204', async () => {

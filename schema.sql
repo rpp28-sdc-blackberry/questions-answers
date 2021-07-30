@@ -52,6 +52,9 @@ CREATE SEQUENCE reviews_seq START 1;
 SELECT setval('reviews_seq', max(id)) FROM reviews;
 ALTER TABLE reviews ALTER COLUMN id SET DEFAULT nextval('reviews_seq');
 
+-- Create index for reviews table
+CREATE INDEX idx_product_id_reviews ON reviews(product_id);
+
 -- PHOTOS TABLE
 CREATE TABLE photos (
   id INT PRIMARY KEY,
@@ -66,6 +69,9 @@ CREATE TABLE photos (
 CREATE SEQUENCE photos_seq START 1;
 SELECT setval('photos_seq', max(id)) FROM photos;
 ALTER TABLE photos ALTER COLUMN id SET DEFAULT nextval('photos_seq');
+
+-- Create index for photos table
+CREATE INDEX idx_review_id_photos ON photos(review_id);
 
 -- CHARACTERISTICS TABLES
 CREATE TABLE characteristics (
@@ -94,6 +100,10 @@ ALTER TABLE characteristics ALTER COLUMN id SET DEFAULT nextval('characteristics
 CREATE SEQUENCE characteristics_reviews_seq START 1;
 SELECT setval('characteristics_reviews_seq', max(id)) FROM characteristics_reviews;
 ALTER TABLE characteristics_reviews ALTER COLUMN id SET DEFAULT nextval('characteristics_reviews_seq');
+
+-- Create index for both characteristics tables
+CREATE INDEX idx_product_id_characteristics ON characteristics(product_id);
+CREATE INDEX idx_review_id_characteristics_reviews ON characteristics_reviews(review_id);
 
 -- Delete temporary reviews table
 DROP TABLE IF EXISTS reviews_temp;

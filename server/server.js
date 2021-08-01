@@ -33,11 +33,12 @@ app.get('/reviews', (req, res) => {
 });
 
 app.get('/reviews/meta', (req, res) => {
-  const productId = req.query.product_id;
+  const productId = Number(req.query.product_id);
 
   db.getMeta(productId)
     .then((objectsArray) => {
       const metaObject = {
+        product_id: productId,
         ratings: objectsArray[0],
         recommended: objectsArray[1],
         characteristics: objectsArray[2],

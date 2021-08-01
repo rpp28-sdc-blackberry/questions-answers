@@ -1,14 +1,11 @@
 require('dotenv').config();
 const { Pool } = require('pg');
 
-// let user;
 let database;
 
 if (process.env.NODE_ENV === 'development') {
-  // user = process.env.PG_USER;
   database = process.env.POSTGRES_DB;
 } else if (process.env.NODE_ENV === 'test') {
-  // user =
   database = 'reviews_test';
 }
 

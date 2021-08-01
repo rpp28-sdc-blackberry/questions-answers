@@ -1,7 +1,7 @@
 const pool = require('./index');
 const helpers = require('./helpers');
 
-const getReviews = (productId, sort, offset, count) => {
+const getReviews = async (productId, sort, offset, count) => {
   let sortValue;
   if (sort === 'newest') {
     sortValue = 'date DESC';
@@ -11,14 +11,37 @@ const getReviews = (productId, sort, offset, count) => {
     sortValue = 'date DESC, helpfulness DESC';
   } else { console.log('invalid sort value'); }
 
-  const query = {
+  const reviewsQuery = {
     text: 'SELECT * FROM reviews WHERE product_id = $1 AND reported = false ORDER BY $2 OFFSET $3 LIMIT $4',
     values: [productId, sortValue, offset, count],
   };
 
-  return pool.query(query)
-    .then((res) => res.rows)
-    .catch((error) => error.stack);
+  const reviewsResponse = await pool.query(reviewsQuery);
+  const reviews = reviewsResponse.rows;
+  const photoQueries = [];
+  reviews.forEach((review) => {
+    const photosQuery = `SELECT * FROM photos WHERE review_id = ${review.id}`;
+    photoQueries.push(pool.query(photosQuery));
+  });
+
+  const photosResponse = await Promise.all(photoQueries);
+  reviews.forEach((review) => {
+    review.photos = [];
+    photosResponse.forEach((response) => {
+      if (response.rowCount && response.rows[0].review_id === review.id) {
+        const photos = [];
+        response.rows.forEach((photoObject) => {
+          const photo = {
+            id: photoObject.id,
+            url: photoObject.url,
+          };
+          photos.push(photo);
+        });
+        review.photos = photos;
+      }
+    });
+  });
+  return reviews;
 };
 
 const getMeta = (productId) => {
